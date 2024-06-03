@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "780438032468",
+    "project_id": "nexgen-agri",
+    "storage_bucket": "nexgen-agri.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780438032468:android:0550cc146c2e83c27b9dc1",
+        "android_client_info": {
+          "package_name": "com.example.nexgen_agri"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQG6ek4qAjX-bloX4LMSvqiAtYGrxc10o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
