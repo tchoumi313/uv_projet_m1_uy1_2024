@@ -30,7 +30,7 @@ default_app = firebase_admin.initialize_app(cred_obj, {
 
 app = Flask(__name__)
 CORS(app)
-run_with_ngrok(app)
+#run_with_ngrok(app)
 
 @app.route('/')
 def home():

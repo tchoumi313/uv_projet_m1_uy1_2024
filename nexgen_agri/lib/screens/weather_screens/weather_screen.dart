@@ -89,11 +89,14 @@ class WeatherScreen extends StatelessWidget {
                     ),
                   ),
               )),
-          Expanded(
+          forecastData.value.isEmpty
+              ? CircularProgressIndicator()
+              : Expanded(
             child: Obx(() => ListView.builder(
                   itemCount: forecastData.value.length,
                   itemBuilder: (context, index) {
                     var dayForecast = forecastData.value[index]['day'];
+                    print(dayForecast);
                     return Card(
                       child: ListTile(
                         leading: Icon(Icons.wb_sunny),
