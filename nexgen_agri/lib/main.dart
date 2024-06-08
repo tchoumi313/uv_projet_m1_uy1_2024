@@ -2,12 +2,14 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:nexgen_agri/screens/auth/login.dart';
 import 'package:nexgen_agri/screens/chatbot/chatbot_screen.dart';
 import 'package:nexgen_agri/screens/dashboard_screen.dart';
 import 'package:nexgen_agri/screens/plant_disease_classification/upload-screen.dart';
 import 'package:nexgen_agri/screens/plant_recommendation/crop_recomandation_form_page.dart';
 import 'package:nexgen_agri/screens/weather_screens/weather_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 
@@ -21,8 +23,17 @@ Future<void> main() async {
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
-  );
-  runApp(const MyApp());
+  ); SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+  runApp(GetMaterialApp(
+    title: 'Plant Disease Detector',
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      useMaterial3: true,
+    ),
+    home: isLoggedIn ? const MyApp() : LoginScreen(),
+  ));
 }
 //e6d987f9-0b81-4e7f-ac47-b94e8338adc4
 /* class MyApp extends StatelessWidget {
@@ -68,13 +79,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Plant Disease Detector',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
+    return  Scaffold(
         body: _widgetOptions[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.greenAccent,
@@ -109,7 +114,7 @@ class _MyAppState extends State<MyApp> {
           onTap: _onItemTapped,
           elevation: 3,
         ),
-      ),
+
     );
   }
 }

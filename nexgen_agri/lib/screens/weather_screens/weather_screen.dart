@@ -89,7 +89,7 @@ class WeatherScreen extends StatelessWidget {
                     ),
                   ),
               )),
-          forecastData.value.isEmpty
+          forecastData.value.isEmpty || forecastData.value.first['message'] == Error || forecastData.value[0]['day'] == null
               ? CircularProgressIndicator()
               : Expanded(
             child: Obx(() => ListView.builder(
@@ -97,14 +97,16 @@ class WeatherScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     var dayForecast = forecastData.value[index]['day'];
                     print(dayForecast);
-                    return Card(
+                    return dayForecast != null?
+                     Card(
                       child: ListTile(
                         leading: Icon(Icons.wb_sunny),
                         title: Text('Day ${index + 1}'),
                         subtitle: Text(
                             '${dayForecast['avgtemp_c']}°C - ${dayForecast['condition']['text']}'),
                       ),
-                    );
+                    ) :
+                    SizedBox();
                   },
                 )),
           ),

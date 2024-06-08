@@ -1,32 +1,45 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nexgen_agri/main.dart';
+import 'package:nexgen_agri/screens/auth/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
   Rxn<User> _firebaseUser = Rxn<User>();
-
+  RxBool loading = false.obs;
   User? get user => _firebaseUser.value;
 
   @override
   void onInit() {
-    _firebaseUser.bindStream(_auth.authStateChanges());
+    _firebaseUser.bindStream(auth.authStateChanges());
     super.onInit();
   }
 
   Future<void> createUser(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      await auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      Get.snackbar("Account created", "Now login to proceed");
+      loading = false.obs;
+      Get.to(() => LoginScreen());
     } catch (e) {
+      loading = false.obs;
       Get.snackbar("Error creating account", e.toString());
     }
   }
 
   Future<void> login(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      await auth.signInWithEmailAndPassword(email: email, password: password);
+      loading = false.obs;
+      Get.snackbar("Login Successful", "Welcome");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      Get.offAll(() => const MyApp());
     } catch (e) {
+      loading = false.obs;
       Get.snackbar("Login Error", e.toString());
     }
   }
@@ -40,14 +53,18 @@ class AuthController extends GetxController {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await _auth.signInWithCredential(credential);
+      await auth.signInWithCredential(credential);
+      loading = false.obs;
     } catch (e) {
+      loading = false.obs;
       Get.snackbar("Google Sign-In Error", e.toString());
     }
   }
 
   void signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
     await GoogleSignIn().signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
   }
 }

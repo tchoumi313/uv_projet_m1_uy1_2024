@@ -1,19 +1,18 @@
 import 'dart:io';
 
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+//Firebase Imports
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nexgen_agri/services/firebase_auth.dart';
 import 'package:nexgen_agri/services/network-helper.dart';
 import 'package:nexgen_agri/utils/constants.dart';
 import 'package:nexgen_agri/widgets/custom-text-button.dart';
-
 //UUID Import
 import 'package:uuid/uuid.dart';
-
-//Firebase Imports
-import 'package:firebase_storage/firebase_storage.dart';
-
 
 import 'diagnosis-screen.dart';
 
@@ -48,8 +47,8 @@ class _UploadScreenState extends State<UploadScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: ListView(
+              //mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -214,6 +213,7 @@ class _UploadScreenState extends State<UploadScreen> {
                                 ),
                               ),
                             );
+                            saveDiseaseDetection(response);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -260,6 +260,22 @@ class _UploadScreenState extends State<UploadScreen> {
       ),
     );
   }
+
+  Future<void> saveDiseaseDetection(Map response) async {
+    String? userId = getCurrentUserId();
+    if (userId != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('detections')
+          .add({
+        'isHealthy': response['Healthy'],
+        'diseaseName': response['Disease'],
+        'description': response['Information'] ?? "NULL",
+        'solution': response['Solutions'],
+        'vegetable': response['Vegetable'],
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+  }
 }
-
-

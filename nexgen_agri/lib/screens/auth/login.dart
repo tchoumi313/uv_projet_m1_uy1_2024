@@ -9,55 +9,61 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Login")),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                ),
+    return  Scaffold(
+        appBar: AppBar(title: Text("Login")),
+        body: Obx(()=>
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      authController.loading = true.obs;
+                      authController.login(
+                          emailController.text, passwordController.text);
+                    },
+                    child: authController.loading.value ? const CircularProgressIndicator() :  const Text("Login"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      authController.loading = true.obs;
+                      authController.createUser(
+                          emailController.text, passwordController.text);
+                    },
+                    child: authController.loading.value ? const CircularProgressIndicator() : Text("Sign Up"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      authController.loading = true.obs;
+                      authController.signInWithGoogle();
+                    },
+                    child: authController.loading.value==true ? const CircularProgressIndicator() : Text("Sign in with Google"),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  authController.login(
-                      emailController.text, passwordController.text);
-                },
-                child: Text("Login"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  authController.createUser(
-                      emailController.text, passwordController.text);
-                },
-                child: Text("Sign Up"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  authController.signInWithGoogle();
-                },
-                child: Text("Sign in with Google"),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+      )
+    ;
   }
 }

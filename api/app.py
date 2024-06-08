@@ -1,5 +1,7 @@
+import os
 import pickle
 
+import openai
 from config import openweatherapi, weatherapi
 #import firebase_admin
 #from firebase_admin import db
@@ -8,6 +10,8 @@ from flask_cors import CORS
 from flask_ngrok import run_with_ngrok
 from plant import plant
 from requests import get as requests_get
+from requests import post as requests_post
+from werkzeug.utils import secure_filename
 
 """ key={
   "type": "service_account",
@@ -37,7 +41,6 @@ def home():
     return "Hello Welcome to the API homepage"
 
 # Image API call
-
 @app.route('/imageLink',methods=["POST"])
 def imagelink():
     data=request.json
@@ -143,6 +146,91 @@ def get_four_day_forecast():
         return jsonify(forecast_days)
     else:
         return jsonify({'error': 'Daily forecast data not available'}), 404
+
+# Point to the local LM Studio server
+openai.api_key = 'lm-studio'
+openai.api_base = 'http://localhost:1234/v1'
+
+@app.route('/lmstudio', methods=['POST'])
+def lmstudio():
+    try:
+        data = request.json
+        prompt = data['prompt']
+        
+        # Define the initial system message
+        history = [
+            {"role": "system", "content": "You are a Cameroonian agriculture assistant. You always provide well-reasoned answers that are both correct and helpful."},
+            {"role": "user", "content": prompt},
+        ]
+
+        # Send the prompt to the LM Studio model
+        response = openai.ChatCompletion.create(
+            model="lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF",  # Replace with your specific model identifier
+            messages=history,
+            temperature=0.7,
+        )
+        print(response)
+        # Extract the assistant's response
+        assistant_message = response.choices[0].message['content']
+        print(assistant_message)
+        return jsonify({'response': assistant_message})
+    except Exception as e:
+        current_app.logger.error(f"Error: {e}")
+        return jsonify({'message': 'Unsuccessful', 'error': str(e)}), 500
+
+@app.route('/chat_completion', methods=['POST'])
+def chat_completion():
+    try:
+        data = request.json
+        prompt = data['prompt']
+
+        data ={
+          "model": "mistral-small-latest",
+          "messages": [
+            { "role": "assistant",
+              "content": "You are a Cameroonian agriculture assistant. You always provide well-reasoned answers that are both correct and helpful."},
+              {"role": "user",
+              "content": prompt
+            }
+          ],
+          "temperature": 0.7,
+          "top_p": 1,
+          "max_tokens": 512,
+          "stream": False,
+          "safe_prompt": False,
+          "random_seed": 1337
+        }
+            #request.json
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer 3Vw6h1Kb3lrdpFrk2FaPbztNN17isvj8'  # Replace YOUR_API_KEY with your actual API key
+        }
+        url = 'https://api.mistral.ai/v1/chat/completions'
+        response = requests_post(url, json=data, headers=headers)
+        print(response)
+        response = response.json()
+        assistant_message = response["choices"][0]["message"]['content']
+        print(assistant_message)
+        return jsonify({'response': assistant_message})
+        return jsonify(response.json()), response.status_code
+    except Exception as e:
+        return jsonify({'error': str(e), 'message': 'Failed to process chat completion request'}), 500
+
+@app.route('/upload_file', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join('/path/to/save', filename))  # Adjust the path as necessary
+
+        # Now send the file to Mistral AI
+        headers = {
+            'Authorization': 'Bearer YOUR_API_KEY'  # Replace YOUR_API_KEY with your actual API key
+        }
 
 if __name__ == "__main__":
     app.run()

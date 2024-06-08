@@ -31,3 +31,11 @@ Future<User?> signInWithGoogle() async {
       await FirebaseAuth.instance.signInWithCredential(credential);
   return userCredential.user;
 }
+
+User? getCurrentUser() {
+  return FirebaseAuth.instance.currentUser;
+}
+
+String? getCurrentUserId() {
+  return FirebaseAuth.instance.currentUser?.uid;
+}
