@@ -92,7 +92,7 @@ def predict_crop():
 
 
         # Prepare the recommendation result for the response
-        result = f"Recommended crop: {predicted_crop_label}"
+        result = f"{predicted_crop_label}"
         print(result)
         return jsonify({'result': result})
 

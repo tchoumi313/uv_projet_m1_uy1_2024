@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nexgen_agri/models/chat_history.dart';
 import 'package:nexgen_agri/screens/chatbot/controller/chatbot_controller.dart';
+import 'package:nexgen_agri/services/database.dart';
+import 'package:nexgen_agri/services/firebase_auth.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
@@ -14,7 +18,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final TextEditingController _textController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    loadChatHistory();
+  }
+
+  void loadChatHistory() async {
+    Database db = await NoteDatabase.instance.database;
+    List<Map> history = await db.query('chat_history',
+        where: 'user_id = ?', whereArgs: [getCurrentUserId()]);
+    _controller.chatHistory
+        .assignAll(history.map((e) => ChatHistory.fromMap(e)).toList());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _textController.text = ModalRoute.of(context)!.settings.arguments==null? "" : ModalRoute.of(context)!.settings.arguments as String;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
@@ -53,15 +73,15 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 return ListView.builder(
                   itemCount: _controller.chatHistory.length,
                   itemBuilder: (context, index) {
-                    var message = _controller.chatHistory[index];
-                    bool isUser = message['role'] == 'user';
+                    ChatHistory message = _controller.chatHistory[index];
+                    bool isUser = message.role == 'user';
                     return Align(
                       alignment:
                           isUser ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
-
-                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        padding: const EdgeInsets.all(10 ),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isUser ? Colors.green[100] : Colors.white,
                           borderRadius: BorderRadius.circular(10),
@@ -78,13 +98,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              message['content']!,
+                              message.content,
                               style: TextStyle(color: Colors.black),
                             ),
                             SizedBox(height: 5),
                             Text(
-                              message['role']!,
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                              message.role,
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12),
                             ),
                           ],
                         ),
@@ -120,8 +141,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       icon: Icon(Icons.send, color: Colors.white),
                       onPressed: () async {
                         if (_textController.text.isNotEmpty) {
-                          bool response =
-                              await _controller.sendMessage(_textController.text);
+                          bool response = await _controller
+                              .sendMessage(_textController.text);
                           if (response) {
                             _textController.clear();
                           } else {

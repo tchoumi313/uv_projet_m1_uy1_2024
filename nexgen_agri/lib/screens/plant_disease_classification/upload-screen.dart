@@ -1,16 +1,17 @@
 import 'dart:io';
 
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 //Firebase Imports
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nexgen_agri/services/database.dart';
 import 'package:nexgen_agri/services/firebase_auth.dart';
 import 'package:nexgen_agri/services/network-helper.dart';
 import 'package:nexgen_agri/utils/constants.dart';
 import 'package:nexgen_agri/widgets/custom-text-button.dart';
+import 'package:sqflite/sqflite.dart';
 //UUID Import
 import 'package:uuid/uuid.dart';
 
@@ -262,20 +263,16 @@ class _UploadScreenState extends State<UploadScreen> {
   }
 
   Future<void> saveDiseaseDetection(Map response) async {
-    String? userId = getCurrentUserId();
-    if (userId != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('detections')
-          .add({
-        'isHealthy': response['Healthy'],
-        'diseaseName': response['Disease'],
-        'description': response['Information'] ?? "NULL",
-        'solution': response['Solutions'],
-        'vegetable': response['Vegetable'],
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    }
+    Database db = await NoteDatabase.instance.database;
+    await db.insert('disease_detections', {
+      'user_id':
+          getCurrentUserId(), // Assuming you have a method to get the current user ID
+      'isHealthy': response['Healthy'],
+      'diseaseName': response['Disease'],
+      'description': response['Information'] ?? "No description available",
+      'solution': response['Solutions'],
+      'vegetable': response['Vegetable'],
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
   }
 }

@@ -1,9 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nexgen_agri/screens/chatbot/chatbot_screen.dart';
+import 'package:nexgen_agri/services/database.dart';
 import 'package:nexgen_agri/services/firebase_auth.dart';
 import 'package:nexgen_agri/services/network-helper.dart';
+import 'package:nexgen_agri/utils/constants.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CropController extends GetxController {
   final RxDouble nitrogen = 0.0.obs;
@@ -14,7 +17,20 @@ class CropController extends GetxController {
   final RxDouble rainfall = 0.0.obs;
   final RxDouble temperature = 0.0.obs;
 
-  Future<void> predictCrop() async {
+
+  Future<void> deleteRecommendation(int id) async {
+    Database db = await NoteDatabase.instance.database;
+    await db.delete(
+      'recommendations',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (kDebugMode) {
+      print('Deleted recommendation with ID: $id');
+    }
+  }
+
+  Future<bool> predictCrop() async {
     final Map<String, String> body = {
       'nitrogen': nitrogen.value.toString(),
       'phosphorus': phosphorus.value.toString(),
@@ -31,36 +47,102 @@ class CropController extends GetxController {
     if (response['message'] == 'Error') {
       Get.snackbar("Error", "Failed to fetch prediction",
           snackPosition: SnackPosition.BOTTOM);
+      return false;
     } else {
       if (kDebugMode) {
         print(" Result ${response['result']}");
       }
-      saveCropRecommendation(response['result']);
-      Get.snackbar("Prediction Result", response['result'],
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(minutes: 1),
-          backgroundColor: Colors.greenAccent);
+      showCropDetailsModal(Get.context!, response['result']);
+      return true;
     }
   }
 
-  Future<void> saveCropRecommendation(String recommendation) async {
-    String? userId = getCurrentUserId();
-    if (userId != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('recommendations')
-          .add({
-        'nitrogen': nitrogen.value,
-        'phosphorus': phosphorus.value,
-        'potassium': potassium.value,
-        'ph': ph.value,
-        'temperature': temperature.value,
-        'humidity': humidity.value,
-        'rainfall': rainfall.value,
-        'recommendation': recommendation,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    }
+  void showCropDetailsModal(BuildContext context, String cropName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(cropName.toUpperCase()),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Image.asset(crop_images[cropName]!),
+                SizedBox(height: 20),
+                Text(
+                    "Learn how to cultivate $cropName with the best practices for your soil."),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate to the chatbot screen
+                    Get.to(()=>const ChatbotScreen(),
+                        arguments: "How to cultivate $cropName?");
+                  },
+                  child: Text('Ask the Chatbot'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Save Recommendation'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                confirmSaveRecommendation(context, cropName);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void confirmSaveRecommendation(BuildContext context, String recommendation) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Save'),
+          content: Text('Do you want to save this recommendation?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                saveRecommendation(recommendation);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> saveRecommendation(String recommendation) async {
+    Database db = await NoteDatabase.instance.database;
+    await db.insert('recommendations', {
+      'user_id':
+          getCurrentUserId(), // Assuming you have a method to get the current user ID
+      'nitrogen': nitrogen.value,
+      'phosphorus': phosphorus.value,
+      'potassium': potassium.value,
+      'ph': ph.value,
+      'temperature': temperature.value,
+      'humidity': humidity.value,
+      'rainfall': rainfall.value,
+      'recommendation': recommendation,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
   }
 }
