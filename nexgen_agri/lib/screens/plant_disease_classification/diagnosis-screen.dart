@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:nexgen_agri/screens/chatbot/chatbot_screen.dart';
 import 'package:nexgen_agri/screens/plant_disease_classification/solution_screen.dart';
 import 'package:nexgen_agri/widgets/custom-text-button.dart';
 
@@ -110,6 +112,14 @@ class DiagnosisScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                !isHealthy ? ElevatedButton(
+                  onPressed: () {
+                    // Navigate to the chatbot screen
+                    Get.to(() => const ChatbotScreen(),
+                        arguments: "How to treat the disease $diseaseName?. \n Description $description");
+                  },
+                  child: Text('Ask the Chatbot'),
+                ): const SizedBox.shrink(),
                 !isHealthy ? Padding(
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
                   child: CustomTextButton(

@@ -62,9 +62,10 @@ class AuthController extends GetxController {
   }
 
   void signOut() async {
-    await auth.signOut();
-    await GoogleSignIn().signOut();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
+  await prefs.setBool('isLoggedIn', false);
+    await auth.signOut();
+    //await GoogleSignIn().signOut();
+
   }
 }

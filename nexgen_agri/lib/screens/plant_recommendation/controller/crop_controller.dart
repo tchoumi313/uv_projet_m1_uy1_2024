@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,7 +18,6 @@ class CropController extends GetxController {
   final RxDouble humidity = 0.0.obs;
   final RxDouble rainfall = 0.0.obs;
   final RxDouble temperature = 0.0.obs;
-
 
   Future<void> deleteRecommendation(int id) async {
     Database db = await NoteDatabase.instance.database;
@@ -74,7 +75,7 @@ class CropController extends GetxController {
                 ElevatedButton(
                   onPressed: () {
                     // Navigate to the chatbot screen
-                    Get.to(()=>const ChatbotScreen(),
+                    Get.to(() => const ChatbotScreen(),
                         arguments: "How to cultivate $cropName?");
                   },
                   child: Text('Ask the Chatbot'),
@@ -144,5 +145,36 @@ class CropController extends GetxController {
       'recommendation': recommendation,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
+  }
+
+  Future<void> deleteDiseaseDetection(int id) async {
+    Database db = await NoteDatabase.instance.database;
+    // Retrieve the disease detection to get the imagePath
+    List<Map> detections = await db.query(
+      'diseases_detections',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (detections.isNotEmpty) {
+      String? imagePath = detections.first['imagePath'] as String?;
+      if (imagePath != null && imagePath.isNotEmpty) {
+        // Delete the image file
+        File imageFile = File(imagePath);
+        if (await imageFile.exists()) {
+          await imageFile.delete();
+        }
+      }
+    }
+
+    // Delete the record from the database
+    await db.delete(
+      'diseases_detections',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (kDebugMode) {
+      print(
+          'Deleted disease detection with ID: $id and associated image file.');
+    }
   }
 }

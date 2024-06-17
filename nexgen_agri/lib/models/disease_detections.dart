@@ -6,7 +6,8 @@ class DiseaseDetection {
   final String? description;
   final String solution;
   final String vegetable;
-  final int timestamp;
+  final String imagePath;
+  //final int timestamp;
 
   DiseaseDetection({
     required this.id,
@@ -16,7 +17,8 @@ class DiseaseDetection {
     this.description,
     required this.solution,
     required this.vegetable,
-    required this.timestamp,
+    required this.imagePath,
+    //required this.timestamp,
   });
 
   DiseaseDetection.fromMap(Map<dynamic, dynamic> map)
@@ -27,5 +29,6 @@ class DiseaseDetection {
         description = map['description'],
         solution = map['solution'],
         vegetable = map['vegetable'],
-        timestamp = map['timestamp'];
+        imagePath = map['imagePath'] ?? "";
+       // timestamp = map['timestamp'];
 }

@@ -41,10 +41,29 @@ class TestFlaskApi(TestCase):
 
     def test_check_disease(self):
         # Assuming checkDisease expects POST with JSON data
-        data = {'image_url': 'http://example.com/image.jpg'}
+        data = {'link': 'https://randompicturegenerator.com/img/flower-generator/g30ba8d335f46eac468764c2b81cb448d1a14e77bc16db6df1114de507292452f88e140ba57471ffe6b9cc1695dbde5a8_640.jpg'}
         response = self.client.post('/checkDisease', json=data)
         self.assertEqual(response.status_code, 200)
         print('Check disease endpoint response:', response.data.decode())
+
+    def test_completion_endpoint(self):
+        # Sample prompt for testing
+        data = {'prompt': 'How can I improve my crop yield?'}
+
+        # Send a POST request to the completion endpoint
+        response = self.client.post('/chat_completion', json=data)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response content
+        response_data = response.get_json()
+        self.assertIn('response', response_data)
+        self.assertIsInstance(response_data['response'], str)
+        self.assertNotEqual(response_data['response'], '')  # Ensure the response is not empty
+
+        print('Chat completion endpoint response:', response_data['response'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -27,6 +27,7 @@ Future<void> main() async {
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
   runApp(GetMaterialApp(
+    debugShowCheckedModeBanner: false,
     title: 'Plant Disease Detector',
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

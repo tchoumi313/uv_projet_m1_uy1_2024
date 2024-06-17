@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nexgen_agri/services/network-helper.dart';
+import 'package:nexgen_agri/utils/constants.dart';
 
 class WeatherScreen extends StatelessWidget {
   final Rx<Map<dynamic, dynamic>> currentWeather =
@@ -40,8 +41,8 @@ class WeatherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weather Forecast'),
-        backgroundColor: Colors.blueGrey,
+        title: Text('Weather Forecast',style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.green,
       ),
       body: Column(
         children: <Widget>[
@@ -49,19 +50,19 @@ class WeatherScreen extends StatelessWidget {
               ? CircularProgressIndicator()
               : Expanded(
                 child: Card(
-                    margin: EdgeInsets.all(8.0),
+                    margin: EdgeInsets.all(getHeight(8, context)),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(getHeight(16, context)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
                               'Current Weather: ${currentWeather.value['temp_c']}°C',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          SizedBox(height: 10),
+                                  fontSize: getHeight(18, context), fontWeight: FontWeight.bold)),
+                          SizedBox(height: getHeight(10, context)),
                           Text(currentWeather.value['condition']['text'],
-                              style: TextStyle(fontSize: 16)),
+                              style: TextStyle(fontSize: getHeight(16, context))),
                           Divider(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,7 +73,7 @@ class WeatherScreen extends StatelessWidget {
                                   'Direction: ${currentWeather.value['wind_dir']}'),
                             ],
                           ),
-                          SizedBox(height: 5),
+                          SizedBox(height: getHeight(5, context)),
                           Text(
                               'Humidity: ${currentWeather.value['humidity']}%'),
                           Text(

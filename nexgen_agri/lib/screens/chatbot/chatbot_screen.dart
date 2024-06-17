@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nexgen_agri/models/chat_history.dart';
 import 'package:nexgen_agri/screens/chatbot/controller/chatbot_controller.dart';
 import 'package:nexgen_agri/services/database.dart';
 import 'package:nexgen_agri/services/firebase_auth.dart';
+import 'package:nexgen_agri/utils/constants.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ChatbotScreen extends StatefulWidget {
@@ -119,8 +121,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Expanded(
+                  Container(
+                    width:getWidth(360, context),
                     child: TextField(
+                      maxLines: 1,
                       controller: _textController,
                       decoration: InputDecoration(
                         hintText: 'Enter your message',

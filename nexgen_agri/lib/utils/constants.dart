@@ -27,7 +27,7 @@ var crop_images = {
   "passionfruit": "assets/Crops/passionfruit.jpg",
   "starfruit": "assets/Crops/starfruit.jpg",
   "coconut": "assets/Crops/coconut.jpg",
-  "durian": "assets/Crops/durian.jpg",
+  "maize": "assets/Crops/maize.jpg",
   "jackfruit": "assets/Crops/jackfruit.jpg",
   "lychee": "assets/Crops/lychee.jpg",
   "mangosteen": "assets/Crops/mangosteen.jpg",

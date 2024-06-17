@@ -18,7 +18,7 @@ class NoteDatabase {
 
   Future<Database> _initDatabase() async {
     final databasePath = await getDatabasesPath();
-    final path = '$databasePath/nexgen_agri.db';
+    final path = '$databasePath/nexgen-agri.db';
     return await openDatabase(
       path,
       version: 1,
@@ -44,7 +44,7 @@ class NoteDatabase {
     ''');
 
     await db.execute('''
-      CREATE TABLE disease_detections (
+      CREATE TABLE diseases_detections (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT NOT NULL,
         isHealthy BOOLEAN NOT NULL,
@@ -52,6 +52,7 @@ class NoteDatabase {
         description TEXT,
         solution TEXT,
         vegetable TEXT,
+        imagePath TEXT
         timestamp INTEGER NOT NULL
       )
     ''');

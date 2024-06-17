@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nexgen_agri/utils/constants.dart';
 
 import './controller/crop_controller.dart';
 
@@ -25,18 +26,18 @@ class CropPredictionScreen extends StatelessWidget {
                 opacity: 0.2,
               ),
             ),
-            padding: const EdgeInsets.all(20.0),
+            padding:  EdgeInsets.all(getHeight(20, context)),
             child: Column(
               children: [
-                _buildTextFormField('Nitrogen', cropController.nitrogen),
-                _buildTextFormField('Phosphorus', cropController.phosphorus),
-                _buildTextFormField('Potassium', cropController.potassium),
-                _buildTextFormField('pH', cropController.ph, max: 14),
-                _buildTextFormField('Humidity (%)', cropController.humidity),
-                _buildTextFormField('Rainfall', cropController.rainfall),
-                _buildTextFormField(
+                _buildTextFormField(context,'Nitrogen', cropController.nitrogen),
+                _buildTextFormField(context,'Phosphorus', cropController.phosphorus),
+                _buildTextFormField(context,'Potassium', cropController.potassium),
+                _buildTextFormField(context,'pH', cropController.ph, max: 14),
+                _buildTextFormField(context,'Humidity (%)', cropController.humidity),
+                _buildTextFormField(context,'Rainfall', cropController.rainfall),
+                _buildTextFormField(context,
                     'Temperature (°C)', cropController.temperature),
-                SizedBox(height: 20),
+                SizedBox(height: getHeight(20, context)),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
@@ -45,7 +46,7 @@ class CropPredictionScreen extends StatelessWidget {
                   }, child: Text('Predict'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.green, // Example button color
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    padding: EdgeInsets.symmetric(horizontal: getWidth(50, context), vertical: getHeight(20, context)),
                   ),
                 ),
               ],
@@ -56,10 +57,10 @@ class CropPredictionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextFormField(String label, RxDouble controllerValue,
+  Widget _buildTextFormField(BuildContext context, String label, RxDouble controllerValue,
       {double? max}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding:  EdgeInsets.symmetric(vertical: getHeight(10, context)),
       child: TextFormField(
         style: TextStyle(color: Colors.black45),
         decoration: InputDecoration(

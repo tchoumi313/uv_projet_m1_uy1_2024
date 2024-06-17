@@ -5,12 +5,14 @@ import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:nexgen_agri/services/database.dart';
 import 'package:nexgen_agri/services/firebase_auth.dart';
 import 'package:nexgen_agri/services/network-helper.dart';
 import 'package:nexgen_agri/utils/constants.dart';
 import 'package:nexgen_agri/widgets/custom-text-button.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 //UUID Import
 import 'package:uuid/uuid.dart';
@@ -214,7 +216,7 @@ class _UploadScreenState extends State<UploadScreen> {
                                 ),
                               ),
                             );
-                            saveDiseaseDetection(response);
+                            saveDiseaseDetection(response, imageUrl);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -262,9 +264,29 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
-  Future<void> saveDiseaseDetection(Map response) async {
+  Future<void> saveDiseaseDetection(Map response, String imageUrl) async {
+    // Get the application documents directory
+    Directory directory = await getApplicationDocumentsDirectory();
+    String directoryPath = '${directory.path}/plants';
+
+    // Create the directory if it does not exist
+    Directory plantsDirectory = Directory(directoryPath);
+    if (!await plantsDirectory.exists()) {
+      await plantsDirectory.create(
+          recursive:
+              true); // Use recursive: true to create all non-existent directories
+    }
+
+    String filePath = '$directoryPath/${uuid.v4()}.jpg';
+
+    // Download the image
+    http.Response imageData = await http.get(Uri.parse(imageUrl));
+    File imageFile = File(filePath);
+    await imageFile.writeAsBytes(imageData.bodyBytes);
+
+    // Save to database
     Database db = await NoteDatabase.instance.database;
-    await db.insert('disease_detections', {
+    await db.insert('diseases_detections', {
       'user_id':
           getCurrentUserId(), // Assuming you have a method to get the current user ID
       'isHealthy': response['Healthy'],
@@ -272,7 +294,8 @@ class _UploadScreenState extends State<UploadScreen> {
       'description': response['Information'] ?? "No description available",
       'solution': response['Solutions'],
       'vegetable': response['Vegetable'],
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'imagePath': filePath, // Save the local path
+      //'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
   }
 }
