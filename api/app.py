@@ -232,6 +232,6 @@ def upload_file():
             'Authorization': 'Bearer YOUR_API_KEY'  # Replace YOUR_API_KEY with your actual API key
         }
 
-""" if __name__ == "__main__":
+if __name__ == "__main__":
     app.run()
- """
+
