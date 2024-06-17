@@ -232,7 +232,7 @@ def upload_file():
             'Authorization': 'Bearer YOUR_API_KEY'  # Replace YOUR_API_KEY with your actual API key
         }
 
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Get the PORT environment variable or default to 5000
     app.run(port=port)
-
+ """
