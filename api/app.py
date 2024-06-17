@@ -233,5 +233,6 @@ def upload_file():
         }
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 3000))  # Get the PORT environment variable or default to 5000
+    app.run(port=port)
 
