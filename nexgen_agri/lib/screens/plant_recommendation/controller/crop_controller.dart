@@ -18,7 +18,7 @@ class CropController extends GetxController {
   final RxDouble humidity = 0.0.obs;
   final RxDouble rainfall = 0.0.obs;
   final RxDouble temperature = 0.0.obs;
-
+  final RxBool isLoading = false.obs;
   Future<void> deleteRecommendation(int id) async {
     Database db = await NoteDatabase.instance.database;
     await db.delete(
@@ -32,6 +32,7 @@ class CropController extends GetxController {
   }
 
   Future<bool> predictCrop() async {
+    isLoading(true);
     final Map<String, String> body = {
       'nitrogen': nitrogen.value.toString(),
       'phosphorus': phosphorus.value.toString(),
@@ -48,12 +49,15 @@ class CropController extends GetxController {
     if (response['message'] == 'Error') {
       Get.snackbar("Error", "Failed to fetch prediction",
           snackPosition: SnackPosition.BOTTOM);
+      isLoading(false);
       return false;
     } else {
       if (kDebugMode) {
         print(" Result ${response['result']}");
       }
       showCropDetailsModal(Get.context!, response['result']);
+
+      isLoading(false);
       return true;
     }
   }

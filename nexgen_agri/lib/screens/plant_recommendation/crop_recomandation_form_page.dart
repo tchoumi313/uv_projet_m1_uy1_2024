@@ -38,17 +38,26 @@ class CropPredictionScreen extends StatelessWidget {
                 _buildTextFormField(context,
                     'Temperature (°C)', cropController.temperature),
                 SizedBox(height: getHeight(20, context)),
+                Obx(() => cropController.isLoading.value? ElevatedButton(
+                  onPressed: () {
+
+                  }, child:  Text('Loading...'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.green, // Example button color
+                    padding: EdgeInsets.symmetric(horizontal: getWidth(50, context), vertical: getHeight(20, context)),
+                  ),
+                ) :
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       cropController.predictCrop();
                     }
-                  }, child: Text('Predict'),
+                  }, child:  Text('Predict'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.green, // Example button color
                     padding: EdgeInsets.symmetric(horizontal: getWidth(50, context), vertical: getHeight(20, context)),
                   ),
-                ),
+                ),)
               ],
             ),
           ),

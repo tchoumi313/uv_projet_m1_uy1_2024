@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-const String domain = "http://10.0.2.2:5000";//'https://ve4h9pohto3k.share.zrok.io';
+const String domain = "https://uv-projet-m1-uy1-2024.onrender.com";//"http://10.0.2.2:5000";//'https://ve4h9pohto3k.share.zrok.io';
 const String weatherUrl = "https://openweather.com";
 
 class NetworkHelper {

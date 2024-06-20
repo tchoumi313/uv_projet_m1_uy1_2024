@@ -59,7 +59,7 @@ def load_image(img_path, show=False):
 
 def plant(image_url):
     #keras.layers.TFSMLayer() keras.layers.TFSMLayer(PlantTest, call_endpoint='serving_default')  #
-    new_model = tf.keras.models.load_model('/home/donsoft/Documents/school/M1/S2/uv_projet/NexGen_Agri/api/models/model.h5')
+    new_model = tf.keras.models.load_model('../api/models/model.h5')
     print(new_model.summary())
 
     response = requests.get(image_url)
@@ -68,7 +68,10 @@ def plant(image_url):
     file.close()
     images = load_image("Test.png", show=True)
     print("Image loaded")
-    print("Shape of the input tensor:", images.shape)
+    binary_model = tf.keras.models.load_model('../api/models/binary_classifier.h5')
+    prediction = binary_model.predict(images)
+    if prediction[0][0] <= 0.7:
+        return {'message': 'The provided image is not a plant image'}
     pred = new_model.predict(images)
     maxElement = np.amax(pred)
     result = np.where(pred == np.amax(pred))

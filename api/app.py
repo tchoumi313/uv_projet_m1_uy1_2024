@@ -54,6 +54,8 @@ def checkdisease():
         image_link = data['link']
         print(image_link)
         result = plant(image_link)
+        if result['message'] == 'The provided image is not a plant image':
+            return {'message': 'The provided image is not a plant image'}
         result['message'] = 'Successful'
         return jsonify(result)
     except Exception as e:
@@ -232,7 +234,7 @@ def upload_file():
             'Authorization': 'Bearer YOUR_API_KEY'  # Replace YOUR_API_KEY with your actual API key
         }
 
-""" if __name__ == "__main__":
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Get the PORT environment variable or default to 5000
     app.run(port=port)
- """
+

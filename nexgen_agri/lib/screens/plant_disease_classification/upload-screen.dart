@@ -217,9 +217,20 @@ class _UploadScreenState extends State<UploadScreen> {
                               ),
                             );
                             saveDiseaseDetection(response, imageUrl);
-                          } else {
+                          } else if(response['message'] == 'The provided image is not a plant image' ) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(
+                                duration: Duration(seconds: 10),
+                                content: Text(
+                                  response['message'],
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            );
+                          }else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
+                                duration: Duration(seconds: 10),
                                 content: Text(
                                   'An Error Occurred',
                                   style: TextStyle(color: Colors.red),

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:nexgen_agri/models/chat_history.dart';
 import 'package:nexgen_agri/screens/chatbot/controller/chatbot_controller.dart';
@@ -18,11 +20,24 @@ class ChatbotScreen extends StatefulWidget {
 class _ChatbotScreenState extends State<ChatbotScreen> {
   final ChatbotController _controller = Get.put(ChatbotController());
   final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToEndButton = false;
 
   @override
   void initState() {
     super.initState();
     loadChatHistory();
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        if (_scrollController.position.pixels == 0) {
+          setState(() => _showScrollToEndButton = false);
+        } else {
+          setState(() => _showScrollToEndButton = false);
+        }
+      } else {
+        setState(() => _showScrollToEndButton = true);
+      }
+    });
   }
 
   void loadChatHistory() async {
@@ -31,6 +46,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         where: 'user_id = ?', whereArgs: [getCurrentUserId()]);
     _controller.chatHistory
         .assignAll(history.map((e) => ChatHistory.fromMap(e)).toList());
+  }
+
+  void _scrollToEnd() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   @override
@@ -51,6 +74,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           ],
         ),
         actions: [
+
           IconButton(
             icon: Icon(Icons.more_vert, color: Colors.white),
             onPressed: () {
@@ -71,15 +95,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         child: Column(
           children: [
             Expanded(
+
               child: Obx(() {
                 return ListView.builder(
+                  controller: _scrollController,
+                  shrinkWrap: true,
+
                   itemCount: _controller.chatHistory.length,
                   itemBuilder: (context, index) {
                     ChatHistory message = _controller.chatHistory[index];
                     bool isUser = message.role == 'user';
                     return Align(
                       alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 10),
@@ -103,11 +131,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                               message.content,
                               style: TextStyle(color: Colors.black),
                             ),
-                            SizedBox(height: 5),
+                            SizedBox(height: getHeight(5, context)),
                             Text(
                               message.role,
                               style:
-                                  TextStyle(color: Colors.grey, fontSize: 12),
+                              TextStyle(color: Colors.grey, fontSize: getHeight(12, context),
+                              fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -118,13 +147,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               }),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(getHeight(8, context)),
               child: Row(
                 children: [
                   Container(
                     width:getWidth(360, context),
                     child: TextField(
-                      maxLines: 1,
+                      maxLines: null,
+                      minLines: 1,
                       controller: _textController,
                       decoration: InputDecoration(
                         hintText: 'Enter your message',
@@ -133,12 +163,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: getHeight(20, context),
+                            vertical: getWidth(5, context)
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(width: getWidth(10, context)),
                   CircleAvatar(
                     backgroundColor: Colors.green,
                     child: IconButton(
@@ -169,6 +201,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           ],
         ),
       ),
+      floatingActionButton: _showScrollToEndButton
+          ? FloatingActionButton(
+        onPressed: _scrollToEnd,
+        child: Icon(Icons.arrow_downward,color: Colors.green,),
+      )
+          : null,
     );
   }
 }
