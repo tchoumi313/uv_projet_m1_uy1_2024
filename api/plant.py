@@ -68,10 +68,10 @@ def plant(image_url):
     file.close()
     images = load_image("Test.png", show=False)
     print("Image loaded")
-    binary_model = tf.keras.models.load_model('../api/models/binary_classifier.h5')
-    prediction = binary_model.predict(images)
-    if prediction[0][0] <= 0.7:
-        return {'message': 'The provided image is not a plant image'}
+    #binary_model = tf.keras.models.load_model('../api/models/binary_classifier.h5')
+    #prediction = binary_model.predict(images)
+    #if prediction[0][0] <= 0.7:
+    #    return {'message': 'The provided image is not a plant image'}
     pred = new_model.predict(images)
     maxElement = np.amax(pred)
     result = np.where(pred == np.amax(pred))
