@@ -29,14 +29,14 @@ class CropPredictionScreen extends StatelessWidget {
             padding:  EdgeInsets.all(getHeight(20, context)),
             child: Column(
               children: [
-                _buildTextFormField(context,'Nitrogen', cropController.nitrogen),
-                _buildTextFormField(context,'Phosphorus', cropController.phosphorus),
-                _buildTextFormField(context,'Potassium', cropController.potassium),
+                _buildTextFormField(context,'Nitrogen', cropController.nitrogen,max: 141),
+                _buildTextFormField(context,'Phosphorus', cropController.phosphorus,max: 145),
+                _buildTextFormField(context,'Potassium', cropController.potassium, max: 205),
                 _buildTextFormField(context,'pH', cropController.ph, max: 14),
-                _buildTextFormField(context,'Humidity (%)', cropController.humidity),
-                _buildTextFormField(context,'Rainfall', cropController.rainfall),
+                _buildTextFormField(context,'Humidity (%)', cropController.humidity,max: 100),
+                _buildTextFormField(context,'Rainfall', cropController.rainfall,max: 300),
                 _buildTextFormField(context,
-                    'Temperature (°C)', cropController.temperature),
+                    'Temperature (°C)', cropController.temperature,max: 44),
                 SizedBox(height: getHeight(20, context)),
                 Obx(() => cropController.isLoading.value? ElevatedButton(
                   onPressed: () {

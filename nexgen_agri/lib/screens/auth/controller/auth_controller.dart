@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nexgen_agri/main.dart';
@@ -22,10 +23,10 @@ class AuthController extends GetxController {
       await auth.createUserWithEmailAndPassword(
           email: email, password: password);
       Get.snackbar("Account created", "Now login to proceed");
-      loading = false.obs;
+      loading(false);
       Get.to(() => LoginScreen());
     } catch (e) {
-      loading = false.obs;
+      loading(false);
       Get.snackbar("Error creating account", e.toString());
     }
   }
@@ -33,14 +34,15 @@ class AuthController extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
-      loading = false.obs;
+      loading(false);
       Get.snackbar("Login Successful", "Welcome");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       Get.offAll(() => const MyApp());
     } catch (e) {
-      loading = false.obs;
-      Get.snackbar("Login Error", e.toString());
+      loading(false);
+      print(e.toString());
+      Get.snackbar("Login Error", "Please try back", backgroundColor: Colors.redAccent, colorText: Colors.white);
     }
   }
 

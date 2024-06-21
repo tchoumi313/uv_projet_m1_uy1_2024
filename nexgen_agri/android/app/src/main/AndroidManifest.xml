@@ -5,7 +5,7 @@
     <application
         android:label="nexgen_agri"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher1">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -27,8 +27,7 @@ class LoginScreen extends StatelessWidget {
         padding: EdgeInsets.all(getHeight(20, context)),
         child: Center(
           child: SingleChildScrollView(
-            child: Obx(
-          () =>   Column(
+            child:  Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                    Row(
@@ -73,50 +72,38 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: getHeight(20, context)),
-                  ElevatedButton(
+                  Obx(() =>  authController.loading.value
+                      ? const CircularProgressIndicator()
+                      :ElevatedButton(
                     onPressed: () {
-                      authController.loading = true.obs;
+                      authController.loading(true);
                       authController.login(
                           emailController.text, passwordController.text);
                     },
-                    child: authController.loading.value
-                        ? const CircularProgressIndicator()
-                        : const Text("Login"),
+                    child: const Text("Login"),
                     style: ElevatedButton.styleFrom(
                       foregroundColor:
-                          Colors.green[800], // Dark green color for button
+                      Colors.green[800], // Dark green color for button
                     ),
-                  ),
-                  ElevatedButton(
+                  ),),
+                  Obx(() => authController.loading.value
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
                     onPressed: () {
-                      authController.loading = true.obs;
+                      authController.loading(true);
                       authController.createUser(
                           emailController.text, passwordController.text);
                     },
-                    child: authController.loading.value
-                        ? const CircularProgressIndicator()
-                        : Text("Sign Up"),
+                    child:  Text("Sign Up"),
                     style: ElevatedButton.styleFrom(
                       foregroundColor:
-                          Colors.green[500], // Lighter green color for button
+                      Colors.green[500], // Lighter green color for button
                     ),
-                  ),
-                /*  ElevatedButton(
-                    onPressed: () {
-                      authController.loading = true.obs;
-                      authController.signInWithGoogle();
-                    },
-                    child: authController.loading.value == true
-                        ? const CircularProgressIndicator()
-                        : Text("Sign in with Google"),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor:
-                          Colors.green[300], // Light green color for button
-                    ),
-                  ),*/
+                  ),),
+
                 ],
               ),
-            ),
+
           ),
         ),
       ),

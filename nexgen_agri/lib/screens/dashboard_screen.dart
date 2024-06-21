@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
   final CropController cropController = Get.put(CropController());
   final RxList<Recommendation> recommendations = <Recommendation>[].obs;
   final RxList<DiseaseDetection> diseases = <DiseaseDetection>[].obs;
-
+  final RxBool loading = false.obs;
   DashboardScreen({Key? key}) : super(key: key) {
     loadInitialData();
   }
@@ -44,6 +44,14 @@ class DashboardScreen extends StatelessWidget {
         title: Text('Dashboard', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: () async {
+              loading(true);
+              loadInitialData();
+              loading(false);
+              },
+          ),
+          IconButton(
             icon: Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
               authController.signOut();
@@ -52,11 +60,12 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            loadInitialData(); // Call the loadBooks method from the controller to refresh data
-            },
+      body: RefreshIndicator(
+        onRefresh: () async {
+          loadInitialData(); // Call the loadBooks method from the controller to refresh data
+          },
+        child: Obx(() =>  loading.value? Center(child: CircularProgressIndicator(),) :
+            SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,42 +82,42 @@ class DashboardScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   )),
               Obx(() => SizedBox(
-                    height: getHeight(200, context),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: recommendations.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () => showRecommendationModal(
-                              context, recommendations[index]),
-                          child: Card(
-                            elevation: 1,
-                            color: Colors.transparent,
-                            child: Container(
-                              margin: EdgeInsets.all(getHeight(10, context)),
-                              padding: EdgeInsets.all(getHeight(10, context)),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage(crop_images[
-                                        recommendations[index].recommendation]!),
-                                    fit: BoxFit.cover,
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.black38, BlendMode.darken)),
-                              ),
-                              width: getWidth(180, context),
-                              child: ListTile(
-                                textColor: Colors.white,
-                                title: Text(recommendations[index]
-                                    .recommendation
-                                    .toUpperCase()),
-                                subtitle: Text('Tap for details'),
-                              ),
-                            ),
+                height: getHeight(200, context),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recommendations.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => showRecommendationModal(
+                          context, recommendations[index]),
+                      child: Card(
+                        elevation: 1,
+                        color: Colors.transparent,
+                        child: Container(
+                          margin: EdgeInsets.all(getHeight(10, context)),
+                          padding: EdgeInsets.all(getHeight(10, context)),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage(crop_images[
+                                recommendations[index].recommendation]!),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.black38, BlendMode.darken)),
                           ),
-                        );
-                      },
-                    ),
-                  )),
+                          width: getWidth(180, context),
+                          child: ListTile(
+                            textColor: Colors.white,
+                            title: Text(recommendations[index]
+                                .recommendation
+                                .toUpperCase()),
+                            subtitle: Text('Tap for details'),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )),
               Padding(
                   padding: EdgeInsets.only(left: getWidth(20, context)),
                   child: Text(
@@ -119,40 +128,40 @@ class DashboardScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   )),
               Obx(() => SizedBox(
-                    height: getHeight(200, context),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: diseases.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () => showDiseaseModal(context, diseases[index]),
-                          child: Container(
-                            width: getWidth(160, context),
-                            child: Card(
-                              child: Wrap(
-                                children: <Widget>[
-                                  Image.file(File(diseases[index].imagePath) ??
-                                      File('assets/background2.png')),
-                                  ListBody(
-                                    children:[ Text(diseases[index].diseaseName,style: TextStyle(fontWeight: FontWeight.bold,fontSize: getHeight(20, context)),),
-                                     Text("${
-                                      diseases[index]
-                                          .description!
-                                          .substring(0, 40)
+                height: getHeight(200, context),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: diseases.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => showDiseaseModal(context, diseases[index]),
+                      child: Container(
+                        width: getWidth(160, context),
+                        child: Card(
+                          child: Wrap(
+                            children: <Widget>[
+                              Image.file(File(diseases[index].imagePath) ??
+                                  File('assets/background2.png')),
+                              ListBody(
+                                  children:[ Text(diseases[index].diseaseName,style: TextStyle(fontWeight: FontWeight.bold,fontSize: getHeight(20, context)),),
+                                    Text("${
+                                        diseases[index]
+                                            .description!
+                                            .substring(0, 40)
                                     }\n more details..."),]
-                                  ),
-                                ],
                               ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
-                  )),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )),
             ],
           ),
         ),
-      ),
+        ) ),
     );
   }
 
