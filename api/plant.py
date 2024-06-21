@@ -66,7 +66,7 @@ def plant(image_url):
     file = open("Test.png", "wb")
     file.write(response.content)
     file.close()
-    images = load_image("Test.png", show=True)
+    images = load_image("Test.png", show=False)
     print("Image loaded")
     binary_model = tf.keras.models.load_model('../api/models/binary_classifier.h5')
     prediction = binary_model.predict(images)
